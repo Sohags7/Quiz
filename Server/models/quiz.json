@@ -1,0 +1,290 @@
+{
+    "categories": [
+      {
+        "category": "Hawaii Quiz",
+        "questions": [
+          {
+            "question": "Aus wie vielen Inseln besteht Hawaii?",
+            "options": [
+              "132 Inseln",
+              "100 Inseln",
+              "80 Inseln",
+              "150 Inseln"
+            ],
+            "correct_answer": "132 Inseln"
+          },
+          {
+            "question": "Wie viele Buchstaben hat das hawaiianische Alphabet?",
+            "options": [
+              "12 Buchstaben",
+              "24 Buchstaben",
+              "36 Buchstaben",
+              "10 Buchstaben"
+            ],
+            "correct_answer": "12 Buchstaben"
+          },
+          {
+            "question": "In welchem Jahr wurde Hawaii der 50. Staat der USA?",
+            "options": [
+              "1949",
+              "1959",
+              "1969",
+              "1979"
+            ],
+            "correct_answer": "1959"
+          },
+          {
+            "question": "Auf Hawaii gibt es auch den einzigen königlichen Palast der Vereinigten Staaten von Amerika. Wie heißt dieser?",
+            "options": [
+              "Takatukka-Palast",
+              "Kamehameha-Palast",
+              "Iolani-Palast",
+              "King's Palace"
+            ],
+            "correct_answer": "Iolani-Palast"
+          },
+          {
+            "question": "Welcher ist der höchste Berg der Welt?",
+            "options": [
+              "Kilimantscharo",
+              "Mauna Kea",
+              "Mount Everest",
+              "Mount Fuji"
+            ],
+            "correct_answer": "Mauna Kea"
+          },
+          {
+            "question": "Welches ist das einzige frische Produkt, das man aus Hawaii mit auf’s Festland mitnehmen darf?",
+            "options": [
+              "Kokosnüsse",
+              "Ananas",
+              "Bananen",
+              "Mangos"
+            ],
+            "correct_answer": "Ananas"
+          },
+          {
+            "question": "Das Staatsgebiet von Hawaii wächst von Jahr zu Jahr. Warum?",
+            "options": [
+              "Vulkantätigkeit",
+              "Tsunamis",
+              "Erosion",
+              "Erdbeben"
+            ],
+            "correct_answer": "Vulkantätigkeit"
+          },
+          {
+            "question": "Welche Farbe hat die Insel Maui?",
+            "options": [
+              "Rosa",
+              "Rot",
+              "Grün",
+              "Blau"
+            ],
+            "correct_answer": "Rosa"
+          },
+          {
+            "question": "Was ist die Besonderheit der Insel Niihau?",
+            "options": [
+              "Nur eine Familie lebt dort",
+              "Es gibt dort keine Bäume",
+              "Es ist die größte Insel",
+              "Es gibt dort keine Vögel"
+            ],
+            "correct_answer": "Nur eine Familie lebt dort"
+          },
+          {
+            "question": "Welcher Umstand macht die Insel Molokai zur Insel der Superlative?",
+            "options": [
+              "Es gibt die höchsten Meeresklippen",
+              "Es gibt den höchsten Wasserfall",
+              "Es gibt den größten Sandstrand",
+              "Es gibt das älteste Hotel"
+            ],
+            "correct_answer": "Es gibt die höchsten Meeresklippen"
+          }
+        ]
+      },
+      {
+        "category": "JEKAMI Facts of Asia",
+        "questions": [
+          {
+            "question": "In welchen zwei Ländern könnte man im Toten Meer schwimmen?",
+            "options": [
+              "Israel und Ägypten",
+              "Israel und Jordanien",
+              "Israel und Libanon",
+              "Jordanien und Ägypten"
+            ],
+            "correct_answer": "Israel und Jordanien"
+          },
+          {
+            "question": "Ein typisch indonesisches Gericht ist „Nasi goreng“ das auch auf niederländischen Esstischen nicht wegzudenken ist. Was bedeutet „Nasi goreng“ ins Deutsche übersetzt?",
+            "options": [
+              "Gebratener Reis",
+              "Reis mit Gemüse",
+              "Reis mit Hühnerfleisch",
+              "Reis mit Fisch"
+            ],
+            "correct_answer": "Gebratener Reis"
+          },
+          {
+            "question": "Rudyard Kipling ist der Autor des bei Kindern sehr beliebten „Dschungelbuchs“. Besonders gerne gesehen wird die Fassung von Walt Disney. In dieser Verfilmung der Geschichte von 1967 wird einer der Hauptdarsteller, Mogli, von einer Königskobra hypnotisiert. Wie heißt diese Schlange?",
+            "options": [
+              "Scar",
+              "Dschafar",
+              "Kaa",
+              "Rex"
+            ],
+            "correct_answer": "Kaa"
+          },
+          {
+            "question": "Liegt die Höhle Son Doong südlich oder nördlich von unserem Club?",
+            "options": [
+              "Nördlich",
+              "Südlich",
+              "Westlich",
+              "Ostlich"
+            ],
+            "correct_answer": "Nördlich"
+          },
+          {
+            "question": "Wenn man sich in Vietnam bedankt, so sagt man:",
+            "options": [
+              "Xin chao",
+              "Xin vui long",
+              "Cam on",
+              "Chao ban"
+            ],
+            "correct_answer": "Cam on"
+          },
+          {
+            "question": "Dafür verwendete Schlangen sind Giftschlangen. Warum ist das Gift in diesem Getränk nicht schädlich für den Menschen?",
+            "options": [
+              "Weil der Alkohol das Gift denaturiert",
+              "Weil der Schlange zuvor die Zähne gezogen wurden",
+              "FAKE NEWS! Es gibt ein solches Getränk nicht",
+              "Weil das Gift in der Schlange inaktiv ist"
+            ],
+            "correct_answer": "Weil der Alkohol das Gift denaturiert"
+          },
+          {
+            "question": "Wann feiert man in Thailand Neujahr?",
+            "options": [
+              "Wie in Europa, am 01.01.",
+              "Wie in Russland, am 06.01. (Ortodoxes Neujahr)",
+              "Wie in China, Neumond zwischen 21. Januar und 21. Februar (29.01.2025)",
+              "Wie in Japan, am 01.01."
+            ],
+            "correct_answer": "Wie in China, Neumond zwischen 21. Januar und 21. Februar (29.01.2025)"
+          },
+          {
+            "question": "Apropos Geburtstage: hier ein Rätsel: Vorgestern war Lisa 18 Jahre alt. Nächstes Jahr feiert sie ihren 21. Geburtstag. Wie ist das möglich?",
+            "options": [
+              "Heute ist der 1. Januar. Wenn gestern (31. Dezember) Lisas 19. Geburtstag war, war sie vorgestern (30. Dezember) noch 18 Jahre alt. Demnach wird Lisa dieses Jahr 20 Jahre alt und feiert nächstes Jahr ihren 21. Geburtstag.",
+              "Lisa feiert ihren 21. Geburtstag nach 3 Jahren",
+              "Lisa feiert erst ihren 21. Geburtstag in 2 Jahren",
+              "Lisa feiert ihren 21. Geburtstag dieses Jahr"
+            ],
+            "correct_answer": "Heute ist der 1. Januar. Wenn gestern (31. Dezember) Lisas 19. Geburtstag war, war sie vorgestern (30. Dezember) noch 18 Jahre alt. Demnach wird Lisa dieses Jahr 20 Jahre alt und feiert nächstes Jahr ihren 21. Geburtstag."
+          },
+          {
+            "question": "In welcher Stadt finden die Olympischen Sommerspiele 2032 statt?",
+            "options": [
+              "Los Angeles (USA)",
+              "Toronto (Kanada)",
+              "Brisbane (Australien)",
+              "Paris (Frankreich)"
+            ],
+            "correct_answer": "Brisbane (Australien)"
+          },
+          {
+            "question": "Hier in der Nähe gibt es auch ein Weltkulturerbe. Welches?",
+            "options": [
+              "Die Reisterrassen von Da Nang",
+              "Die Altstadt von Hoi An",
+              "Der Konfuzius Tempel in Tam Ky City",
+              "Die Tempel von My Son"
+            ],
+            "correct_answer": "Die Altstadt von Hoi An"
+          },
+          {
+            "question": "Wie heißt der Sensei von Daniel LaRusso im Film „Karate Kid“?",
+            "options": [
+              "Mr. Myagi",
+              "Mr. Kawasaki",
+              "Meister Shifu",
+              "Mr. Lee"
+            ],
+            "correct_answer": "Mr. Myagi"
+          }
+        ]
+      },
+      {
+        "category": "JEKAMI LUHANA",
+        "questions": [
+          {
+            "question": "Aus wie vielen Inseln besteht Hawaii?",
+            "options": [
+              "132 Inseln",
+              "120 Inseln",
+              "100 Inseln",
+              "150 Inseln"
+            ],
+            "answer": "132 Inseln"
+          },
+          {
+            "question": "Wie viele Buchstaben hat das hawaiianische Alphabet?",
+            "options": [
+              "12 Buchstaben",
+              "24 Buchstaben",
+              "36 Buchstaben",
+              "10 Buchstaben"
+            ],
+            "answer": "12 Buchstaben"
+          },
+          {
+            "question": "In welchem Jahr wurde Hawaii der 50. Staat der USA?",
+            "options": [
+              "1949",
+              "1959",
+              "1969",
+              "1955"
+            ],
+            "answer": "1959"
+          },
+          {
+            "question": "Auf Hawaii gibt es auch den einzigen königlichen Palast der Vereinigten Staaten von Amerika. Wie heißt dieser?",
+            "options": [
+              "Takatukka-Palast",
+              "Kamehameha-Palast",
+              "Iolani-Palast",
+              "Kailua-Palast"
+            ],
+            "answer": "Iolani-Palast"
+          },
+          {
+            "question": "Welcher ist der höchste Berg der Welt?",
+            "options": [
+              "Kilimantscharo",
+              "Mauna Kea",
+              "Mount Everest",
+              "Mount Fuji"
+            ],
+            "answer": "Mauna Kea"
+          },
+          {
+            "question": "Welches ist das einzige frische Produkt, dass man aus Hawaii mit auf’s Festland mitnehmen darf?",
+            "options": [
+              "Papaya",
+              "Ananas",
+              "Mango",
+              "Kokosnuss"
+            ],
+            "answer": "Ananas"
+          }
+        ]
+      }
+    ]
+  }
+  
