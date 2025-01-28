@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import RoomForm from "./RoomForm";
+import { useToast } from "@chakra-ui/react";
+
 import {
   Box,
   Button,
@@ -17,7 +19,7 @@ import {
 function RoomValidation() {
   const [roomCode, setRoomCode] = useState("");
   const [view, setView] = useState("");
-  const navigate = useNavigate();
+  const toast = useToast();
 
   const handleJoinRoom = async () => {
     if (!roomCode) {
@@ -35,8 +37,15 @@ function RoomValidation() {
       );
 
       if (!response.ok) {
-        throw new Error("Room code is not correct!");
-      }
+        toast({
+          title: "Invalid Room Code",
+          description: "Room code is not correct! Please try again.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }      
 
       setView("roomform");
     } catch (error) {
