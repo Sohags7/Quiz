@@ -1,10 +1,9 @@
 class Room {
     constructor(roomCode, combinedQuiz, timerDuration) {
         this.roomCode = roomCode;
-        this.members = 0;
+        this.users = []; // Stores users as { name, socketId }
         this.messages = [];
         this.activity = [];
-        this.users = []; // Array to store users as { name, socketId }
         this.quiz = combinedQuiz;
         this.quiz_started = false;
         this.current_question = 0;
@@ -14,13 +13,16 @@ class Room {
     }
 
     addMember(name, socketId) {
-        this.members++;
-        this.users.push({ name, socketId });
+        if (!this.getNameBySocketId(socketId)) { // Prevent duplicate entries
+            this.users.push({ name, socketId });
+        }
     }
 
     removeMember(name) {
-        this.members--;
-        this.users = this.users.filter(user => user.name !== name);
+        const userIndex = this.users.findIndex(user => user.name === name);
+        if (userIndex !== -1) {
+            this.users.splice(userIndex, 1);
+        }
     }
 
     getSocketIdByName(name) {

@@ -46,7 +46,7 @@ const QuizRoom = (onExit) => {
   const [activity, setactivity] =useState(0);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [users, setUsers] = useState(["sajib", "alex", "emma"]);
+  const [users, setUsers] = useState([]);
   const [timeLeft, setTimeLeft] = useState(0);
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(null);
@@ -56,9 +56,16 @@ const QuizRoom = (onExit) => {
   const { name, team } = state || {}; 
   const toast = useToast();
 
+  useEffect(() => {
+    if (!socket) return;
+    socket.emit("joinRoom", { roomCode, name, team });
+    return () => {
+      socket.off("joinRoom"); 
+    };
+  }, []);
  
   useEffect(() => {
-    socket.emit("joinRoom", { roomCode,name,team });
+    
     socket.on("previousMessages",(history) => {
       console.log("previous history",history);
       setMessages(history);
@@ -74,11 +81,21 @@ const QuizRoom = (onExit) => {
     console.log("Message from server:", message);
    });
 
+   socket.on("usersJoined", (users) => {
+    setUsers(users);
+  });
+   const handleUsersJoined = (users) => {
+    console.log(users);
+
+    setUsers(users);
+  };
+
   return () => {
     socket.off('previousMessages');
     socket.off('newMessage');
     socket.off('newMsg');
     socket.off('inValidroom');
+    socket.off("usersJoined", handleUsersJoined);
   };
 
   },[]);
@@ -281,7 +298,7 @@ const QuizRoom = (onExit) => {
                 <Text mb={4} opacity={0.8}>Active Participants:</Text>
                 <AvatarGroup size="md" max={6} mb={4}>
                   {users.map((user) => (
-                    <Avatar key={user} name={user} bg="purple.500" />
+                    <Avatar key={user.socketId} name={user.name} bg="purple.500" />
                   ))}
                 </AvatarGroup>
                 <List spacing={3}>
@@ -295,7 +312,7 @@ const QuizRoom = (onExit) => {
                       alignItems="center"
                     >
                       <Box w={2} h={2} bg="green.400" borderRadius="full" mr={3} />
-                      <Text>{user}</Text>
+                      <Text>{user.name}</Text>
                     </ListItem>
                   ))}
                 </List>

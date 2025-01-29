@@ -18,7 +18,7 @@ export const setupSocket = (io) => {
 
     // Handle a user joining a room
     socket.on("joinRoom", async ({ roomCode, name, team }) => {
-      console.log("Received Data:", { roomCode, name, team });
+      
 
       if (await isValidRoom(roomCode) && name && name.trim() !== '' && team && team.trim() !== '') {
           if (!rooms[roomCode]) {
@@ -27,15 +27,19 @@ export const setupSocket = (io) => {
             const timerDuration = lobby.timer;
             rooms[roomCode] = new Room(roomCode, combinedQuiz, timerDuration);
             rooms[roomCode].messages = [];
+            
           }
-        rooms[roomCode].addMember(name, socket.id);
-        socket.join(roomCode);
-
+          if (!rooms[roomCode].getNameBySocketId(socket.id)) {
+            rooms[roomCode].addMember(name, socket.id);
+            socket.join(roomCode);
+          
+            io.in(roomCode).emit("usersJoined", rooms[roomCode].users);
+          }
+          
         // Notify everyone in the room about the new member
         const joinMessage = `${name} has joined the room.`;
         io.to(roomCode).emit("activity", joinMessage);
-        io.to(roomCode).emit("userJoined", { name, team });
-      console.log("here is old message ",rooms[roomCode].messages)
+        
          io.to(socket.id).emit("previousMessages", rooms[roomCode].messages);
         io.to(socket.id).emit("activityHistory", rooms[roomCode].activity);
       } else {
