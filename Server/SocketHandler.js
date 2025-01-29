@@ -1,45 +1,100 @@
+import Lobby from "./models/Lobby.js";
+import Room from "./models/Room.js";
+
+let rooms = {}; 
+async function isValidRoom(roomCode) {
+  try {
+    const lobby = await Lobby.findOne({ roomCode });
+    return lobby ? true : false;
+  } catch (error) {
+    console.error("Error checking room validity:", error);
+    return false;
+  }
+}
+
 export const setupSocket = (io) => {
-    let clientCount = 0; // Initialize clientCount
-  
-    io.on("connection", (socket) => {
-      console.log("Connected new User:", socket.id);
-  
-      // Increment clientCount when a user connects
-      clientCount++;
-      io.emit("clientCount", clientCount); // Broadcast to all clients
-  
-      // Handle joinRoom event
-      socket.on("joinRoom", async ({ roomCode }) => {
-        console.log(`User ${socket.id} attempted to join room: ${roomCode}`);
+  io.on("connection", (socket) => {
+    console.log("Connected new User:", socket.id);
+
+    // Handle a user joining a room
+    socket.on("joinRoom", async ({ roomCode, name, team }) => {
+      console.log("Received Data:", { roomCode, name, team });
+
+      if (await isValidRoom(roomCode) && name && name.trim() !== '' && team && team.trim() !== '') {
+          if (!rooms[roomCode]) {
+            const lobby = await Lobby.findOne({ roomCode });
+            const combinedQuiz = lobby.categories;
+            const timerDuration = lobby.timer;
+            rooms[roomCode] = new Room(roomCode, combinedQuiz, timerDuration);
+            rooms[roomCode].messages = [];
+          }
+        rooms[roomCode].addMember(name, socket.id);
         socket.join(roomCode);
-        io.to(roomCode).emit("message", `${socket.id} has joined the room.`);
-      });
-  
-      // Handle leaveRoom event
-      socket.on("leaveRoom", ({ roomCode }) => {
-        console.log(`User ${socket.id} left room: ${roomCode}`);
-        socket.leave(roomCode);
-        io.to(roomCode).emit("message", `${socket.id} has left the room.`);
-      });
-  
-      // Handle user disconnect event
-      socket.on("disconnect", () => {
-        console.log("User disconnected:", socket.id);
-  
-        // Decrement clientCount when a user disconnects
-        clientCount--;
-        io.emit("clientCount", clientCount); // Broadcast the updated client count
-      });
-  
-      // Optional: Periodically broadcast client count every 1 second (if needed)
-      const intervalId = setInterval(() => {
-        io.emit("clientCount", clientCount); // Broadcast to all clients
-      }, 1000);
-  
-      // Cleanup the interval when the socket disconnects
-      socket.on("disconnect", () => {
-        clearInterval(intervalId); // Clean up the interval when the user disconnects
-      });
+
+        // Notify everyone in the room about the new member
+        const joinMessage = `${name} has joined the room.`;
+        io.to(roomCode).emit("activity", joinMessage);
+        io.to(roomCode).emit("userJoined", { name, team });
+      console.log("here is old message ",rooms[roomCode].messages)
+         io.to(socket.id).emit("previousMessages", rooms[roomCode].messages);
+        io.to(socket.id).emit("activityHistory", rooms[roomCode].activity);
+      } else {
+        io.to(socket.id).emit("inValidRoom", "Invalid room code or missing data.");
+      }
     });
-  };
-  
+    
+
+    socket.on("newMessage", (message) => {
+      console.log("Received message:", message); 
+    
+      if (!message || !message.text) {
+        console.error("Message does not have a 'text' property");
+        return;
+      }
+     
+      const newMessage = {
+        text: message.text,
+        user: message.user,
+        time: new Date().toLocaleTimeString(),
+      }; 
+      
+      if (rooms[message.roomCode] && newMessage.text!="") {
+        rooms[message.roomCode].messages.push(newMessage);
+        io.to(message.roomCode).emit("newMsg", newMessage);
+      }
+    });
+    
+
+    // Handle user leaving the room
+    socket.on("leaveRoom", ({ roomCode, name }) => {
+      socket.leave(roomCode);
+      if (rooms[roomCode]) {
+        rooms[roomCode].removeMember(name);
+        const leaveMessage = `${name} has left the room.`;
+
+        // Notify everyone in the room
+        io.to(roomCode).emit("activity", leaveMessage);
+        io.to(roomCode).emit("userLeft", { name });
+      }
+    });
+
+    // Handle user disconnection
+    socket.on("disconnect", () => {
+      console.log("User disconnected:", socket.id);
+
+      // Find and remove the disconnected user from their room
+      for (const roomCode in rooms) {
+        const room = rooms[roomCode];
+        const member = room.getNameBySocketId(socket.id);
+        if (member) {
+          room.removeMember(member);
+          const disconnectMessage = `${member} has left the room.`;
+
+          io.to(roomCode).emit("activity", disconnectMessage);
+          io.to(roomCode).emit("userLeft", { name: member });
+        }
+      }
+    });
+  });
+};
+

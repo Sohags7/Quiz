@@ -5,7 +5,7 @@ import {
 } from "@chakra-ui/react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import CreateRoomForm from "./components/CreateRoomForm.jsx";
-import RoomPage from "./pages/RoomPage";
+import QuizRoom  from "./pages/QuizRoom.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import JoinLink from "./pages/qrCodeLink.jsx";
 import RoomValidation from "./components/RoomValidation.jsx";
@@ -19,7 +19,7 @@ function App() {
             <Route path="/create" element={<CreateRoomForm />} />
             <Route path="/qrcodelink/:roomCode" element={<JoinLink />} />
             <Route path="/roomvalidation" element={<RoomValidation />} />
-            <Route path="/joinroom/:roomCode" element={<RoomPage />} />
+            <Route path="/joinroom/:roomCode" element={< QuizRoom />} />
           </Routes>
       </Router>
     </ChakraProvider>
