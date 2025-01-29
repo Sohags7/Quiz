@@ -81,12 +81,10 @@ const QuizRoom = (onExit) => {
     console.log("Message from server:", message);
    });
 
-   socket.on("usersJoined", (users) => {
+   socket.on("usersUpdated", (users) => {
     setUsers(users);
   });
    const handleUsersJoined = (users) => {
-    console.log(users);
-
     setUsers(users);
   };
 
@@ -95,7 +93,7 @@ const QuizRoom = (onExit) => {
     socket.off('newMessage');
     socket.off('newMsg');
     socket.off('inValidroom');
-    socket.off("usersJoined", handleUsersJoined);
+    socket.off("usersUpdated", handleUsersJoined);
   };
 
   },[]);

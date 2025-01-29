@@ -33,7 +33,7 @@ export const setupSocket = (io) => {
             rooms[roomCode].addMember(name, socket.id);
             socket.join(roomCode);
           
-            io.in(roomCode).emit("usersJoined", rooms[roomCode].users);
+            io.in(roomCode).emit("usersUpdated", rooms[roomCode].users);
           }
           
         // Notify everyone in the room about the new member
@@ -95,7 +95,7 @@ export const setupSocket = (io) => {
           const disconnectMessage = `${member} has left the room.`;
 
           io.to(roomCode).emit("activity", disconnectMessage);
-          io.to(roomCode).emit("userLeft", { name: member });
+          io.in(roomCode).emit("usersUpdated", rooms[roomCode].users);
         }
       }
     });
