@@ -94,8 +94,11 @@ const QuizRoom = (onExit) => {
     });
   };
 
+  socket.on("startQuiz",(quizData) => {
+    console.log("here quiz data came", quizData);
+    startQuiz();
+  });
 
- 
   socket.on("activityHistory", (activityHistory) => {
     console.log("New activity received:", activityHistory);
     
@@ -112,7 +115,7 @@ const QuizRoom = (onExit) => {
    const handleUsersJoined = (users) => {
     setUsers(users);
   };
-  socket.on("startQuiz",startQuiz);
+ 
 
   return () => {
     socket.off('previousMessages');
@@ -314,24 +317,25 @@ const QuizRoom = (onExit) => {
               {/* Activity Tab */}
               <TabPanel p={0}>
                 <Box maxH="75vh" overflowY="auto"> {/* Set max height and enable scrolling */}
-                  <List spacing={4}>
-                    {activity.slice().reverse().map((act, index) => ( // Reverse the order
-                      <ListItem
-                        key={index}
-                        p={3}
-                        bg="rgba(255, 255, 255, 0.05)"
-                        borderRadius="lg"
-                      >
-                        <Flex align="center">
-                          <Icon as={FaRegBell} mr={3} color="purple.300" />
-                          <Text flex={1}>{act.msg}</Text>
-                          <Text fontSize="sm" opacity={0.7}>
-                            {act.time}
-                          </Text>
-                        </Flex>
-                      </ListItem>
-                    ))}
-                  </List>
+                <List spacing={4}>
+              {Array.isArray(activity) ? activity.slice().reverse().map((act, index) => (
+                <ListItem
+                  key={index}
+                  p={3}
+                  bg="rgba(255, 255, 255, 0.05)"
+                  borderRadius="lg"
+                >
+                  <Flex align="center">
+                    <Icon as={FaRegBell} mr={3} color="purple.300" />
+                    <Text flex={1}>{act.msg}</Text>
+                    <Text fontSize="sm" opacity={0.7}>
+                      {act.time}
+                    </Text>
+                  </Flex>
+                </ListItem>
+              )) : <Text>No activity found</Text>}
+            </List>
+
                 </Box>
               </TabPanel>
 

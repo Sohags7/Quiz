@@ -65,13 +65,8 @@ const Leaderboard = () => {
 
   const startQuiz = async () => {
     try {
-      await fetch(`/api/lobby/start-quiz`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roomCode }),
-      });
       setQuizStarted(true);
-      setShowTable(true);  // Show the table after quiz starts
+      setShowTable(true);  
       socket.emit("QuizStart",roomCode);
       toast({
         title: "Quiz started",

@@ -52,14 +52,35 @@ export const setupSocket = (io) => {
       }
     });
 
-    socket.on("QuizStart",(roomCode) =>{
-      const message = {
-        msg: `Quiz is started.`,
-        time: new Date().toLocaleTimeString(),
-      };
-      rooms[roomCode].activity.push(message);
-      io.to(roomCode).emit("activityHistory", rooms[roomCode].activity);
-      io.to(roomCode).emit("startQuiz");
+    socket.on("QuizStart", async (roomCode) => {
+      try {
+        const lobby = await Lobby.findOne({ roomCode });
+    
+        if (!lobby) {
+          // Handle the case when no lobby is found
+          return socket.emit('error', { msg: 'Lobby not found' });
+        }
+    
+        const quizData = {
+          roomCode: lobby.roomCode,
+          quizId: lobby.quizId,
+          categories: lobby.categories,
+        };
+    
+      
+        const message = {
+          msg: `Quiz is started.`,
+          time: new Date().toLocaleTimeString(),
+        };
+    
+        io.to(roomCode).emit("activityHistory", message);
+        // Emit the quiz data to start the quiz
+        io.to(roomCode).emit("startQuiz", quizData);
+    
+      } catch (error) {
+        console.error("Error starting quiz:", error);
+        socket.emit("error", { msg: "Failed to start quiz." });
+      }
     });
     
 
