@@ -204,7 +204,7 @@ const QuizRoom = (onExit) => {
         borderBottom="1px solid rgba(255, 255, 255, 0.1)"
       >
         <Heading size="lg" mr={8} display="flex" alignItems="center">
-          <Icon as={FaRocket} mr={2} /> Quiz  {roomCode}
+          <Icon as={FaRocket} mr={2} /> Quiz Room :  {roomCode}
         </Heading>
 
         <Tabs index={activeTab} onChange={setActiveTab} variant="unstyled" flex={1}>
@@ -244,9 +244,18 @@ const QuizRoom = (onExit) => {
               px={8}
               _hover={{ transform: "scale(1.05)" }}
             >
-              Start Quiz
+             Quiz will be Start soon!!
             </Button>
           )}
+          <Button
+              colorScheme="purple"
+              leftIcon={<FaRocket />}
+              borderRadius="full"
+              px={8}
+              _hover={{ transform: "scale(1.05)" }}
+            >
+             {name}
+            </Button>
           <Avatar name="Host" size="sm" bg="purple.500" />
         </Flex>
       </Flex>
