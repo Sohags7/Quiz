@@ -43,7 +43,7 @@ const MotionBox = motion(Box);
 
 const QuizRoom = (onExit) => {
   const [activeTab, setActiveTab] = useState(0);
-  const [activity, setactivity] =useState(0);
+  const [activity, setActivity] =useState([]);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [users, setUsers] = useState([]);
@@ -81,6 +81,20 @@ const QuizRoom = (onExit) => {
     console.log("Message from server:", message);
    });
 
+  //  socket.on('activity', (newActivity) => {
+  //   setActivity((prevActivity) => [...prevActivity, newActivity]);
+  // });
+
+  // Listener for activity history
+  socket.on('activityHistory', (activityHistory) => {
+    console.log(activityHistory);
+
+    setActivity(activityHistory);
+  });
+  const handleActivity = (users) => {
+    setActivity(activityHistory);
+  };
+
    socket.on("usersUpdated", (users) => {
     setUsers(users);
   });
@@ -94,6 +108,10 @@ const QuizRoom = (onExit) => {
     socket.off('newMsg');
     socket.off('inValidroom');
     socket.off("usersUpdated", handleUsersJoined);
+    // socket.off("activity");
+    socket.off("activityHistory",handleActivity);
+
+
   };
 
   },[]);
@@ -189,7 +207,7 @@ const QuizRoom = (onExit) => {
         borderBottom="1px solid rgba(255, 255, 255, 0.1)"
       >
         <Heading size="lg" mr={8} display="flex" alignItems="center">
-          <Icon as={FaRocket} mr={2} /> QUIZ ROOM
+          <Icon as={FaRocket} mr={2} /> Quiz  {roomCode}
         </Heading>
 
         <Tabs index={activeTab} onChange={setActiveTab} variant="unstyled" flex={1}>
@@ -280,16 +298,28 @@ const QuizRoom = (onExit) => {
 
               {/* Activity Tab */}
               <TabPanel p={0}>
-                <List spacing={4}>
-                  <ListItem p={3} bg="rgba(255, 255, 255, 0.05)" borderRadius="lg">
-                    <Flex align="center">
-                      <Icon as={FaRegBell} mr={3} color="purple.300" />
-                      <Text flex={1}>Quiz session started</Text>
-                      <Text fontSize="sm" opacity={0.7}>2 min ago</Text>
-                    </Flex>
-                  </ListItem>
-                </List>
+                <Box maxH="75vh" overflowY="auto"> {/* Set max height and enable scrolling */}
+                  <List spacing={4}>
+                    {activity.slice().reverse().map((act, index) => ( // Reverse the order
+                      <ListItem
+                        key={index}
+                        p={3}
+                        bg="rgba(255, 255, 255, 0.05)"
+                        borderRadius="lg"
+                      >
+                        <Flex align="center">
+                          <Icon as={FaRegBell} mr={3} color="purple.300" />
+                          <Text flex={1}>{act.msg}</Text>
+                          <Text fontSize="sm" opacity={0.7}>
+                            {act.time}
+                          </Text>
+                        </Flex>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
               </TabPanel>
+
 
               {/* Users Tab */}
               <TabPanel p={0}>
