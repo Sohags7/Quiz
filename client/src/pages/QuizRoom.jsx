@@ -55,6 +55,7 @@ const QuizRoom = (onExit) => {
   const { state } = location;
   const { name, team } = state || {}; 
   const toast = useToast();
+  const [newActivityCount, setNewActivityCount] = useState(0);
 
   useEffect(() => {
     if (!socket) return;
@@ -81,20 +82,17 @@ const QuizRoom = (onExit) => {
     console.log("Message from server:", message);
    });
 
-  //  socket.on('activity', (newActivity) => {
-  //   setActivity((prevActivity) => [...prevActivity, newActivity]);
-  // });
-
-  // Listener for activity history
-  socket.on('activityHistory', (activityHistory) => {
-    console.log(activityHistory);
-
+ 
+  socket.on("activityHistory", (activityHistory) => {
+    console.log("New activity received:", activityHistory);
+    
     setActivity(activityHistory);
+    
+    if (activeTab !== 1) {
+      setNewActivityCount((prevCount) => prevCount + 1);
+    }
   });
-  const handleActivity = (users) => {
-    setActivity(activityHistory);
-  };
-
+ 
    socket.on("usersUpdated", (users) => {
     setUsers(users);
   });
@@ -108,18 +106,13 @@ const QuizRoom = (onExit) => {
     socket.off('newMsg');
     socket.off('inValidroom');
     socket.off("usersUpdated", handleUsersJoined);
-    // socket.off("activity");
-    socket.off("activityHistory",handleActivity);
-
-
+    socket.off("activityHistory");
+    
   };
 
   },[]);
 
  
-  
-
-  // Sample questions
   const questions = [
     {
       question: "What is the capital of France?",
@@ -215,10 +208,20 @@ const QuizRoom = (onExit) => {
             <Tab _selected={{ color: "white", bg: "rgba(255, 255, 255, 0.1)" }} borderRadius="lg" mx={1}>
               <Icon as={FaComments} mr={2} /> Messages
             </Tab>
-            <Tab _selected={{ color: "white", bg: "rgba(255, 255, 255, 0.1)" }} borderRadius="lg" mx={1}>
-              <Icon as={FaHistory} mr={2} /> Activity
-            </Tab>
-            <Tab _selected={{ color: "white", bg: "rgba(255, 255, 255, 0.1)" }} borderRadius="lg" mx={1}>
+            <Tab
+                _selected={{ color: "white", bg: "rgba(255, 255, 255, 0.1)" }}
+                borderRadius="lg"
+                mx={1}
+                onClick={() => setNewActivityCount(0)} // Reset count when user clicks
+              >
+                <Icon as={FaHistory} mr={2} /> Activity
+                {newActivityCount > 0 && (
+                  <Badge colorScheme="red" ml={2} borderRadius="full" px={2}>
+                    {newActivityCount}
+                  </Badge>
+                )}
+              </Tab>
+           <Tab _selected={{ color: "white", bg: "rgba(255, 255, 255, 0.1)" }} borderRadius="lg" mx={1}>
               <Icon as={FaUsers} mr={2} /> Users ({users.length})
             </Tab>
           </TabList>
