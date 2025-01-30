@@ -27,21 +27,26 @@ export const setupSocket = (io) => {
             const timerDuration = lobby.timer;
             rooms[roomCode] = new Room(roomCode, combinedQuiz, timerDuration);
             rooms[roomCode].messages = [];
-            
+            rooms[roomCode].activity = [];
+  
           }
           if (!rooms[roomCode].getNameBySocketId(socket.id)) {
             rooms[roomCode].addMember(name, socket.id);
             socket.join(roomCode);
           
-            io.in(roomCode).emit("usersJoined", rooms[roomCode].users);
+            io.in(roomCode).emit("usersUpdated", rooms[roomCode].users);
+            // Notify everyone in the room about the new member
+          const joinMessage = {
+            msg: `${name} has joined the room.`,
+            time: new Date().toLocaleTimeString(),
+          };
+          rooms[roomCode].activity.push(joinMessage);
+          io.to(roomCode).emit("activityHistory", rooms[roomCode].activity);
+         
           }
           
-        // Notify everyone in the room about the new member
-        const joinMessage = `${name} has joined the room.`;
-        io.to(roomCode).emit("activity", joinMessage);
-        
-         io.to(socket.id).emit("previousMessages", rooms[roomCode].messages);
-        io.to(socket.id).emit("activityHistory", rooms[roomCode].activity);
+          io.to(socket.id).emit("previousMessages", rooms[roomCode].messages);
+          
       } else {
         io.to(socket.id).emit("inValidRoom", "Invalid room code or missing data.");
       }
@@ -92,10 +97,14 @@ export const setupSocket = (io) => {
         const member = room.getNameBySocketId(socket.id);
         if (member) {
           room.removeMember(member);
-          const disconnectMessage = `${member} has left the room.`;
-
-          io.to(roomCode).emit("activity", disconnectMessage);
-          io.to(roomCode).emit("userLeft", { name: member });
+    
+          const disconnectMessage = {
+            msg: `${member} has left the room.`,
+            time: new Date().toLocaleTimeString(),
+          };
+          rooms[roomCode].activity.push(disconnectMessage);
+          io.to(roomCode).emit("activityHistory", rooms[roomCode].activity);
+          io.in(roomCode).emit("usersUpdated", rooms[roomCode].users);
         }
       }
     });
