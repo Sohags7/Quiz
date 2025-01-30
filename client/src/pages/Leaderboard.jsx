@@ -16,7 +16,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import Header from "../components/Header";
-
+import socket from "../socket";
 const Leaderboard = () => {
   const [roomCode, setRoomCode] = useState("");
   const [password, setPassword] = useState("");
@@ -72,6 +72,7 @@ const Leaderboard = () => {
       });
       setQuizStarted(true);
       setShowTable(true);  // Show the table after quiz starts
+      socket.emit("QuizStart",roomCode);
       toast({
         title: "Quiz started",
         status: "success",
@@ -109,6 +110,7 @@ const Leaderboard = () => {
         textAlign="center"
       >
        <Header title="Welcome Admin to Quiz Duell" />
+       
 
         {!isLeader ? (
           <VStack spacing={4} align="stretch">
@@ -145,6 +147,7 @@ const Leaderboard = () => {
           </VStack>
         ) : (
           <>
+          <h1>Room Code : <span>{roomCode}</span></h1>
             {!showTable && !quizStarted && (
               <Button
                 colorScheme="green"

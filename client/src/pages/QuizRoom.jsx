@@ -82,6 +82,19 @@ const QuizRoom = (onExit) => {
     console.log("Message from server:", message);
    });
 
+   const startQuiz = () => {
+    setQuizStarted(true);
+    setCurrentQuestion(0);
+    setTimeLeft(questions[0].time);
+    toast({
+      title: "Quiz Started!",
+      status: "success",
+      duration: 2000,
+      isClosable: true
+    });
+  };
+
+
  
   socket.on("activityHistory", (activityHistory) => {
     console.log("New activity received:", activityHistory);
@@ -99,6 +112,7 @@ const QuizRoom = (onExit) => {
    const handleUsersJoined = (users) => {
     setUsers(users);
   };
+  socket.on("startQuiz",startQuiz);
 
   return () => {
     socket.off('previousMessages');
@@ -107,7 +121,8 @@ const QuizRoom = (onExit) => {
     socket.off('inValidroom');
     socket.off("usersUpdated", handleUsersJoined);
     socket.off("activityHistory");
-    
+    socket.off("startQuiz");
+
   };
 
   },[]);
@@ -137,18 +152,7 @@ const QuizRoom = (onExit) => {
     }
   }, [timeLeft]);
 
-  const startQuiz = () => {
-    setQuizStarted(true);
-    setCurrentQuestion(0);
-    setTimeLeft(questions[0].time);
-    toast({
-      title: "Quiz Started!",
-      status: "success",
-      duration: 2000,
-      isClosable: true
-    });
-  };
-
+  
   const handleAnswer = (answerIndex) => {
     // Handle answer logic
     if (currentQuestion < questions.length - 1) {
@@ -238,7 +242,6 @@ const QuizRoom = (onExit) => {
               leftIcon={<FaRocket />}
               borderRadius="full"
               px={8}
-              onClick={startQuiz}
               _hover={{ transform: "scale(1.05)" }}
             >
               Start Quiz

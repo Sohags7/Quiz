@@ -51,6 +51,16 @@ export const setupSocket = (io) => {
         io.to(socket.id).emit("inValidRoom", "Invalid room code or missing data.");
       }
     });
+
+    socket.on("QuizStart",(roomCode) =>{
+      const message = {
+        msg: `Quiz is started.`,
+        time: new Date().toLocaleTimeString(),
+      };
+      rooms[roomCode].activity.push(message);
+      io.to(roomCode).emit("activityHistory", rooms[roomCode].activity);
+      io.to(roomCode).emit("startQuiz");
+    });
     
 
     socket.on("newMessage", (message) => {
