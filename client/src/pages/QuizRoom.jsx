@@ -59,6 +59,8 @@ const QuizRoom = () => {
   const [newActivityCount, setNewActivityCount] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isLocked, setIsLocked] = useState(false);
+  const [Winner,setWinner] = useState("");
+
 
   useEffect(() => {
     if (!socket) return;
@@ -85,6 +87,10 @@ const QuizRoom = () => {
     console.log("Message from server:", message);
    });
 
+   socket.on("WinnerTeam",(data) => {
+    setWinner(data.winnerTeam);
+   })
+
   
 
   socket.on("Question",(quizData,quizDataLength) => {
@@ -105,7 +111,7 @@ const QuizRoom = () => {
       });
     }
       if(quizData.questionIndex == (quizDataLength)){
-      console.log("length",questionLength);
+      
         toast({
           title: "Quiz End! Thank you for Participated in this quiz.",
           status: "success",
@@ -131,6 +137,7 @@ const QuizRoom = () => {
    socket.on("usersUpdated", (users) => {
     setUsers(users);
   });
+  
  
  
   return () => {
@@ -165,6 +172,7 @@ const QuizRoom = () => {
   const lockAnswer = () => {
     if (selectedAnswer) {
       const userAnswer = {
+        index:currentQuestion.questionIndex,
         name:name,
         submitanswer : selectedAnswer,
         correct_answer: currentQuestion.correct_answer,
@@ -452,9 +460,15 @@ const QuizRoom = () => {
             </Box>
           ) : (
             <Flex height="100%" align="center" justify="center">
+             {Winner ? (
+              <Text fontSize="xl" opacity={0.7}>
+                🎉 Congratulations to the Winning Team: {Winner}  🎉
+              </Text>
+            ) : (
               <Text fontSize="xl" opacity={0.7}>
                 {quizStarted ? "Loading next question..." : "Quiz not started yet"}
               </Text>
+            )}
             </Flex>
           )}
         </MotionBox>

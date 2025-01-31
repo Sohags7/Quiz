@@ -25,6 +25,55 @@ const Leaderboard = () => {
   const [showTable, setShowTable] = useState(false);  // New state for controlling table visibility
   const [winner, setWinner] = useState(null);
   const toast = useToast();
+  const [red,setRed] = useState(0);
+  const [blue,setBlue] = useState(0);
+  const [yellow,setYellow] = useState(0);
+  const [green,setGreen] = useState(0);
+
+
+  const determineWinner = () => {
+    const scores = { red, blue, yellow, green };
+    const maxScore = Math.max(red, green, blue, yellow);
+    console.log("winner determine", maxScore);
+  
+    let winnerTeam;
+    for (let team in scores) {
+      if (scores[team] === maxScore) {
+        winnerTeam = team;
+        break;
+      }
+    }
+    socket.emit("Winner", {winnerTeam,maxScore} );
+  
+    setWinner({ username: `${winnerTeam.charAt(0).toUpperCase() + winnerTeam.slice(1)} Team`, score: maxScore });
+  };
+  
+  useEffect(() => {
+    socket.on("scoreUpdate", (team) => {
+      console.log("Score update received for team:", team);
+  
+      if (team === "red") {
+        setRed((prevRed) => prevRed + 1);
+      } else if (team === "blue") {
+        setBlue((prevBlue) => prevBlue + 1);
+      } else if (team === "yellow") {
+        setYellow((prevYellow) => prevYellow + 1);
+      } else if (team === "green") {
+        setGreen((prevGreen) => prevGreen + 1);
+      }
+    });
+    socket.on("quizEnd",(roomCode) => {
+      determineWinner();
+    });
+
+  
+    return () => {
+      socket.off("scoreUpdate");
+      socket.off("quizEnd");
+    };
+  }, []);
+  
+
 
   const handleLogin = async () => {
     try {
@@ -168,19 +217,19 @@ const Leaderboard = () => {
                   <Tbody>
                     <Tr borderBottom="1px solid gray">
                       <Td>Red</Td>
-                      <Td>7</Td>
+                      <Td>{red}</Td>
                     </Tr>
                     <Tr borderBottom="1px solid gray">
                       <Td>Blue</Td>
-                      <Td>9</Td>
+                      <Td>{blue}</Td>
                     </Tr>
                     <Tr borderBottom="1px solid gray">
                       <Td>Green</Td>
-                      <Td>0</Td>
+                      <Td>{green}</Td>
                     </Tr>
                     <Tr borderBottom="1px solid gray">
                       <Td>Yellow</Td>
-                      <Td>9</Td>
+                      <Td>{yellow}</Td>
                     </Tr>
                   </Tbody>
                 </Table>
