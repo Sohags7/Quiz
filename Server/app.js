@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import createRoom from './routes/createroom.js';
 import roomValidation from './routes/roomValidation.js'
+import leaderLogin from './routes/leaderLoginRoutes.js'
 
 const app = express();
 app.use(express.json());
@@ -18,5 +19,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/', createRoom);
 app.use('/api/v1/',roomValidation);
+app.use('/api/v1/',leaderLogin);
+
 
 export default app;

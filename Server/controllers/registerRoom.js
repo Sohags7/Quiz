@@ -7,6 +7,15 @@ const generateRoomCode = () => {
   return crypto.randomBytes(4).toString('hex').toUpperCase();
 };
 
+const generateRandomPassword = (length = 8) => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    password += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return password;
+};
+
 export const roomCreate = async (req, res) => {
   const { quizId, categories, timer } = req.body;
 
@@ -22,6 +31,7 @@ export const roomCreate = async (req, res) => {
 
   try {
     const roomCode = generateRoomCode();
+    const password = generateRandomPassword();
     const selectedCategories = [];
 
     // Iterate over categories to select questions
@@ -47,6 +57,7 @@ export const roomCreate = async (req, res) => {
     const newLobby = new Lobby({
       roomCode,
       quizId,
+      password,
       timer,
       categories: selectedCategories,
     });
@@ -62,6 +73,7 @@ export const roomCreate = async (req, res) => {
       lobby: {
         roomCode: newLobby.roomCode,
         quizId: newLobby.quizId,
+        password: newLobby.password,
         timer: newLobby.timer,
         categories: selectedCategories,
         qrCode: qrCodeUrl,

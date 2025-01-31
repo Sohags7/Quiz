@@ -66,6 +66,7 @@ function CreateRoomForm() {
 
       let data = await response.json();
       data = data.lobby;
+
       toast({
         title: "Room Created",
         description: `Room code: ${data.roomCode}`,
@@ -73,8 +74,9 @@ function CreateRoomForm() {
         duration: 3000,
         isClosable: true,
       });
+      const password = data.password;
 
-      navigate(`/qrcodelink/${data.roomCode}`);
+      navigate(`/qrcodelink/${data.roomCode}`, { state: { password } });
     } catch (error) {
       toast({
         title: "Error",

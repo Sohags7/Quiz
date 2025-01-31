@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, useNavigate } from "react-router-dom"; 
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import {
   Flex,
   Box,
@@ -13,8 +13,13 @@ import { CheckCircleIcon } from "@chakra-ui/icons";
 import { QRCodeSVG } from "qrcode.react";
 import Header from "../components/Header";
 
+
 function JoinLink() {
   const { roomCode } = useParams(); 
+  const location = useLocation();
+  const { state } = location;
+  const { password } = state || {}; 
+
   const navigate = useNavigate(); 
 
   const apiUrl = `http://localhost:3000/api/v1/rooms/joinroom?roomCode=${roomCode}`;
@@ -49,6 +54,21 @@ function JoinLink() {
           shadow="sm"
         >
           {roomCode}
+        </Text>
+        <Text fontSize="lg" color="gray.600" mb={2}>
+          Room password:
+        </Text>
+        <Text
+          fontSize="2xl"
+          fontWeight="bold"
+          color="blue.500"
+          mb={6}
+          bg="blue.50"
+          p={2}
+          borderRadius="md"
+          shadow="sm"
+        >
+          {password}
         </Text>
 
         <QRCodeSVG value={apiUrl} size={350} />
