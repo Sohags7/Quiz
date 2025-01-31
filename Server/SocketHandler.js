@@ -54,35 +54,59 @@ export const setupSocket = (io) => {
 
     socket.on("QuizStart", async (roomCode) => {
       try {
-        const lobby = await Lobby.findOne({ roomCode });
-    
-        if (!lobby) {
-          // Handle the case when no lobby is found
-          return socket.emit('error', { msg: 'Lobby not found' });
-        }
-    
-        const quizData = {
-          roomCode: lobby.roomCode,
-          quizId: lobby.quizId,
-          categories: lobby.categories,
-        };
-    
-      
-        const message = {
-          msg: `Quiz is started.`,
-          time: new Date().toLocaleTimeString(),
-        };
-    
-        io.to(roomCode).emit("activityHistory", message);
-        // Emit the quiz data to start the quiz
-        io.to(roomCode).emit("startQuiz", quizData);
-    
+          const lobby = await Lobby.findOne({ roomCode });
+  
+          if (!lobby) {
+              return socket.emit("error", { msg: "Lobby not found" });
+          }
+  
+          const quizData = {
+              roomCode: lobby.roomCode,
+              times: lobby.timer, // Timer in milliseconds (e.g., 20000 for 20s)
+              quizId: lobby.quizId,
+              categories: lobby.categories,
+          };
+  
+          const timer = quizData.times; // Get the timer value
+          let allQuestions = [];
+  
+          // Collect all questions from all categories
+          let questionIndex=1;
+          quizData.categories.forEach((category) => {
+              category.questions.forEach((question) => {
+                  allQuestions.push({
+                      questionIndex: questionIndex++,
+                      question: question.question,
+                      options: question.options,
+                      correct_answer: question.correct_answer,
+                      timer : timer
+                  });
+              });
+          });
+        console.log(timer);
+
+          // Send each question one by one every `timer` milliseconds
+          let index = 0;
+          function sendNextQuestion() {
+              if (index < allQuestions.length) {
+                  io.to(roomCode).emit("Question", allQuestions[index],questionIndex);
+                  index++;
+  
+                  // Schedule the next question
+                  setTimeout(sendNextQuestion, timer*1000);
+                  // setTimeout(sendNextQuestion, 1000);
+              }
+          }
+  
+          // Start sending questions
+          sendNextQuestion();
+  
       } catch (error) {
-        console.error("Error starting quiz:", error);
-        socket.emit("error", { msg: "Failed to start quiz." });
+          console.error("Error starting quiz:", error);
+          socket.emit("error", { msg: "An error occurred while starting the quiz." });
       }
-    });
-    
+  });
+
 
     socket.on("newMessage", (message) => {
       console.log("Received message:", message); 

@@ -41,7 +41,7 @@ import { Navigate, useLocation, useParams } from 'react-router-dom';
 
 const MotionBox = motion(Box);
 
-const QuizRoom = (onExit) => {
+const QuizRoom = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [activity, setActivity] =useState([]);
   const [messages, setMessages] = useState([]);
@@ -50,6 +50,7 @@ const QuizRoom = (onExit) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [questionLength,setQuestionLength] = useState(0);
   const location = useLocation();
   const { roomCode } = useParams();
   const { state } = location;
@@ -82,21 +83,20 @@ const QuizRoom = (onExit) => {
     console.log("Message from server:", message);
    });
 
-   const startQuiz = () => {
-    setQuizStarted(true);
-    setCurrentQuestion(0);
-    setTimeLeft(questions[0].time);
-    toast({
-      title: "Quiz Started!",
-      status: "success",
-      duration: 2000,
-      isClosable: true
-    });
-  };
+  
 
-  socket.on("startQuiz",(quizData) => {
+  socket.on("Question",(quizData,quizDataLength) => {
     console.log("here quiz data came", quizData);
-    startQuiz();
+    setCurrentQuestion(quizData);
+    setQuestionLength(quizDataLength);
+    setTimeLeft(quizData.timer);
+    setQuizStarted(true);
+    // toast({
+    //   title: "Quiz Started!",
+    //   status: "success",
+    //   duration: 2000,
+    //   isClosable: true
+    // });
   });
 
   socket.on("activityHistory", (activityHistory) => {
@@ -125,26 +125,11 @@ const QuizRoom = (onExit) => {
     socket.off("usersUpdated", handleUsersJoined);
     socket.off("activityHistory");
     socket.off("startQuiz");
-
+    socket.off("Question");
   };
 
   },[]);
 
- 
-  const questions = [
-    {
-      question: "What is the capital of France?",
-      answers: ["London", "Paris", "Berlin", "Madrid"],
-      correct: 1,
-      time: 20
-    },
-    {
-      question: "Which planet is closest to the Sun?",
-      answers: ["Venus", "Mars", "Mercury", "Earth"],
-      correct: 2,
-      time: 15
-    }
-  ];
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -158,9 +143,8 @@ const QuizRoom = (onExit) => {
   
   const handleAnswer = (answerIndex) => {
     // Handle answer logic
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion((prev) => prev + 1);
-      setTimeLeft(questions[currentQuestion + 1].time);
+    if (currentQuestion.questionIndex < questionLength) {
+      console.log("Answer",answerIndex);
     } else {
       setQuizStarted(false);
     }
@@ -377,11 +361,11 @@ const QuizRoom = (onExit) => {
           initial={{ x: 20 }}
           animate={{ x: 0 }}
         >
-          {quizStarted && currentQuestion !== null ? (
+          {quizStarted && currentQuestion.question !== null ? (
             <Box>
               <Flex justify="space-between" mb={8}>
                 <Tag colorScheme="purple" px={4} py={2}>
-                  Question {currentQuestion + 1} of {questions.length}
+                  Question {currentQuestion.questionIndex} of {questionLength-1}
                 </Tag>
                 <Flex align="center" gap={2}>
                   <Icon as={FaClock} />
@@ -398,10 +382,10 @@ const QuizRoom = (onExit) => {
                 mb={8}
               >
                 <Heading size="lg" mb={6}>
-                  {questions[currentQuestion].question}
+                  {currentQuestion.question}
                 </Heading>
                 <Stack spacing={4}>
-                  {questions[currentQuestion].answers.map((answer, i) => (
+                {(currentQuestion?.options || []).map((answer, i) => (
                     <Button
                       key={i}
                       justifyContent="start"
@@ -409,7 +393,7 @@ const QuizRoom = (onExit) => {
                       p={6}
                       bg="rgba(255, 255, 255, 0.1)"
                       _hover={{ bg: "rgba(255, 255, 255, 0.15)" }}
-                      onClick={() => handleAnswer(i)}
+                      onClick={() => handleAnswer(answer)}
                     >
                       <Badge colorScheme="purple" mr={4}>{String.fromCharCode(65 + i)}</Badge>
                       {answer}
@@ -419,7 +403,7 @@ const QuizRoom = (onExit) => {
               </MotionBox>
 
               <Progress
-                value={(currentQuestion + 1) / questions.length * 100}
+                value={(currentQuestion.questionIndex) / (questionLength-1) * 100}
                 size="sm"
                 colorScheme="purple"
                 borderRadius="full"
