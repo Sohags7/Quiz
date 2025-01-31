@@ -57,6 +57,8 @@ const QuizRoom = () => {
   const { name, team } = state || {}; 
   const toast = useToast();
   const [newActivityCount, setNewActivityCount] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [isLocked, setIsLocked] = useState(false);
 
   useEffect(() => {
     if (!socket) return;
@@ -90,7 +92,10 @@ const QuizRoom = () => {
     setCurrentQuestion(quizData);
     setQuestionLength(quizDataLength);
     setTimeLeft(quizData.timer);
-    
+    setIsLocked(false);
+    selectedAnswer(null);
+
+
     if(quizData.questionIndex == 1) {
       setQuizStarted(true);
       toast({
@@ -159,14 +164,18 @@ const QuizRoom = () => {
   }, [timeLeft]);
 
   
-  const handleAnswer = (answerIndex) => {
-    // Handle answer logic
-    if (currentQuestion.questionIndex < questionLength) {
-      console.log("Answer",answerIndex);
-    } else {
-      setQuizStarted(false);
+  const handleAnswer = (answer) => {
+      console.log("Answer",answer,name,team);
+      if (!isLocked) {
+        setSelectedAnswer(answer);
+      }
+  };
+  const lockAnswer = () => {
+    if (selectedAnswer) {
+      setIsLocked(true);
     }
   };
+  
 
   const sendMessage = () => {
     if (!newMessage.trim()) {
@@ -197,7 +206,7 @@ const QuizRoom = () => {
     setNewMessage(""); 
   };
   
-  
+
 
   return (
     <Box minH="100vh" bgGradient="linear(to-br, #1a0f3c, #2d1b69)" color="white">
@@ -379,11 +388,11 @@ const QuizRoom = () => {
           initial={{ x: 20 }}
           animate={{ x: 0 }}
         >
-          {quizStarted && currentQuestion.question !== null ? (
+           {quizStarted && currentQuestion.question !== null ? (
             <Box>
               <Flex justify="space-between" mb={8}>
                 <Tag colorScheme="purple" px={4} py={2}>
-                  Question {currentQuestion.questionIndex} of {questionLength-1}
+                  Question {currentQuestion.questionIndex} of {questionLength - 1}
                 </Tag>
                 <Flex align="center" gap={2}>
                   <Icon as={FaClock} />
@@ -403,14 +412,16 @@ const QuizRoom = () => {
                   {currentQuestion.question}
                 </Heading>
                 <Stack spacing={4}>
-                {(currentQuestion?.options || []).map((answer, i) => (
+                  {(currentQuestion?.options || []).map((answer, i) => (
                     <Button
                       key={i}
                       justifyContent="start"
                       size="lg"
                       p={6}
-                      bg="rgba(255, 255, 255, 0.1)"
-                      _hover={{ bg: "rgba(255, 255, 255, 0.15)" }}
+                      bg={selectedAnswer === answer ? "purple.600" : "rgba(255, 255, 255, 0.1)"}
+                      _hover={isLocked ? {} : { bg: "rgba(3, 230, 52, 0.15)" }}
+                      color={selectedAnswer === answer ? "white" : "inherit"}
+                      isDisabled={isLocked}
                       onClick={() => handleAnswer(answer)}
                     >
                       <Badge colorScheme="purple" mr={4}>{String.fromCharCode(65 + i)}</Badge>
@@ -418,7 +429,17 @@ const QuizRoom = () => {
                     </Button>
                   ))}
                 </Stack>
-              </MotionBox>
+                </MotionBox>
+
+                <Button
+                  colorScheme="purple"
+                  size="lg"
+                  w="100%"
+                  isDisabled={!selectedAnswer || isLocked}
+                  onClick={lockAnswer}
+                >
+                  {isLocked ? "Answer Locked" : "Lock Answer"}
+                </Button>
 
               <Progress
                 value={(currentQuestion.questionIndex) / (questionLength-1) * 100}
