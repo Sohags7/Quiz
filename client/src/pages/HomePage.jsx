@@ -39,6 +39,15 @@ const HomePage = () => {
         >
           Join a Room
         </Button>
+        <Button
+          colorScheme="orange"
+          size="lg"
+          onClick={() => navigate("/leaderboard")}
+          shadow="md"
+          _hover={{ transform: "scale(1.05)" }}
+        >
+          DashBoard
+        </Button>
       </VStack>
     </Flex>
   );

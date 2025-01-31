@@ -2,6 +2,8 @@ import Lobby from "./models/Lobby.js";
 import Room from "./models/Room.js";
 
 let rooms = {}; 
+let roomScores = {};
+
 async function isValidRoom(roomCode) {
   try {
     const lobby = await Lobby.findOne({ roomCode });
@@ -11,6 +13,7 @@ async function isValidRoom(roomCode) {
     return false;
   }
 }
+
 
 export const setupSocket = (io) => {
   io.on("connection", (socket) => {
@@ -52,6 +55,42 @@ export const setupSocket = (io) => {
       }
     });
 
+
+    function evaluateQuestion(roomCode, questionIndex) {
+      const questionData = roomScores[roomCode]?.[questionIndex];
+      if (!questionData) return;
+    
+      const { correctAnswer, answers } = questionData;
+    
+      for (const team in answers) {
+        const submissions = answers[team];
+        const answerCounts = {};
+    
+        // Count occurrences of each answer
+        submissions.forEach(({ submitAnswer }) => {
+          answerCounts[submitAnswer] = (answerCounts[submitAnswer] || 0) + 1;
+        });
+    
+        // Determine the majority answer
+        let majorityAnswer = null;
+        let maxCount = 0;
+        for (const answer in answerCounts) {
+          if (answerCounts[answer] > maxCount) {
+            majorityAnswer = answer;
+            maxCount = answerCounts[answer];
+          }
+        }
+    
+        // Award point if the majority answer is correct
+        if (majorityAnswer === correctAnswer) {
+          // Increment the team's score (implement your scoring logic here)
+          console.log(`Team ${team} earns a point for question ${questionIndex}`);
+          socket.emit("scoreUpdate", team);
+        }
+      }
+    }
+    
+
     socket.on("QuizStart", async (roomCode) => {
       try {
           const lobby = await Lobby.findOne({ roomCode });
@@ -83,23 +122,50 @@ export const setupSocket = (io) => {
                   });
               });
           });
-        console.log(timer);
+
+          allQuestions.push({
+            questionIndex: questionIndex,
+            question: '',
+            options: '',
+            correct_answer: '',
+            timer : timer
+        });
+        
 
           // Send each question one by one every `timer` milliseconds
           let index = 0;
+          
           function sendNextQuestion() {
+            if((index-1)>=0) {
+              evaluateQuestion(quizData.roomCode,index);
+
+            }
+
               if (index < allQuestions.length) {
                   io.to(roomCode).emit("Question", allQuestions[index],questionIndex);
                   index++;
   
                   // Schedule the next question
-                  setTimeout(sendNextQuestion, timer*1000);
-                  // setTimeout(sendNextQuestion, 1000);
+                   setTimeout(sendNextQuestion, timer*1000);
+                  //  setTimeout(sendNextQuestion, 2000);
+              }
+              else {
+                console.log("quizevent handle fire");
+                socket.emit("quizEnd",(roomCode));
+                socket.on("Winner", (data) => {
+                  const { winnerTeam, maxScore } = data;
+                  console.log(winnerTeam);
+                  io.to(roomCode).emit("WinnerTeam",data);
+                });
               }
           }
   
-          // Start sending questions
+          // Start sending questions 
           sendNextQuestion();
+         
+
+
+
   
       } catch (error) {
           console.error("Error starting quiz:", error);
@@ -107,6 +173,37 @@ export const setupSocket = (io) => {
       }
   });
 
+
+  socket.on("userSelectedAnswer", (userAnswer) => {
+    const { index, name, submitanswer, correct_answer, team, roomCode } = userAnswer;
+  
+    // Initialize the room if it doesn't exist
+    if (!roomScores[roomCode]) {
+      roomScores[roomCode] = {};
+    }
+  
+    // Initialize the question if it doesn't exist
+    if (!roomScores[roomCode][index]) {
+      roomScores[roomCode][index] = {
+        correctAnswer: correct_answer,
+        answers: {
+          blue: [],
+          red: [],
+          green: [],
+          yellow: [],
+        },
+      };
+    }
+  
+    // Store the user's answer
+    // console.log("submited Answer",submitanswer);
+    // console.log("correct Answer",correct_answer);
+
+    roomScores[roomCode][index].answers[team].push({ name, submitAnswer: submitanswer });
+  });
+ 
+   
+  
 
     socket.on("newMessage", (message) => {
       console.log("Received message:", message); 
