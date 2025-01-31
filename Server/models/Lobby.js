@@ -13,6 +13,7 @@ const questionSchema = new mongoose.Schema({
 const lobbySchema = new mongoose.Schema({
   roomCode: { type: String, required: true, unique: true },
   quizId: { type: Number, unique: true },
+  password: { type: String, required: true },
   timer : { type: Number,required: true},
   categories: [
     {

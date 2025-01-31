@@ -41,7 +41,7 @@ import { Navigate, useLocation, useParams } from 'react-router-dom';
 
 const MotionBox = motion(Box);
 
-const QuizRoom = (onExit) => {
+const QuizRoom = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [activity, setActivity] =useState([]);
   const [messages, setMessages] = useState([]);
@@ -50,6 +50,7 @@ const QuizRoom = (onExit) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [questionLength,setQuestionLength] = useState(0);
   const location = useLocation();
   const { roomCode } = useParams();
   const { state } = location;
@@ -82,7 +83,22 @@ const QuizRoom = (onExit) => {
     console.log("Message from server:", message);
    });
 
- 
+  
+
+  socket.on("Question",(quizData,quizDataLength) => {
+    console.log("here quiz data came", quizData);
+    setCurrentQuestion(quizData);
+    setQuestionLength(quizDataLength);
+    setTimeLeft(quizData.timer);
+    setQuizStarted(true);
+    // toast({
+    //   title: "Quiz Started!",
+    //   status: "success",
+    //   duration: 2000,
+    //   isClosable: true
+    // });
+  });
+
   socket.on("activityHistory", (activityHistory) => {
     console.log("New activity received:", activityHistory);
     
@@ -99,6 +115,7 @@ const QuizRoom = (onExit) => {
    const handleUsersJoined = (users) => {
     setUsers(users);
   };
+ 
 
   return () => {
     socket.off('previousMessages');
@@ -107,26 +124,12 @@ const QuizRoom = (onExit) => {
     socket.off('inValidroom');
     socket.off("usersUpdated", handleUsersJoined);
     socket.off("activityHistory");
-    
+    socket.off("startQuiz");
+    socket.off("Question");
   };
 
   },[]);
 
- 
-  const questions = [
-    {
-      question: "What is the capital of France?",
-      answers: ["London", "Paris", "Berlin", "Madrid"],
-      correct: 1,
-      time: 20
-    },
-    {
-      question: "Which planet is closest to the Sun?",
-      answers: ["Venus", "Mars", "Mercury", "Earth"],
-      correct: 2,
-      time: 15
-    }
-  ];
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -137,23 +140,11 @@ const QuizRoom = (onExit) => {
     }
   }, [timeLeft]);
 
-  const startQuiz = () => {
-    setQuizStarted(true);
-    setCurrentQuestion(0);
-    setTimeLeft(questions[0].time);
-    toast({
-      title: "Quiz Started!",
-      status: "success",
-      duration: 2000,
-      isClosable: true
-    });
-  };
-
+  
   const handleAnswer = (answerIndex) => {
     // Handle answer logic
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion((prev) => prev + 1);
-      setTimeLeft(questions[currentQuestion + 1].time);
+    if (currentQuestion.questionIndex < questionLength) {
+      console.log("Answer",answerIndex);
     } else {
       setQuizStarted(false);
     }
@@ -200,7 +191,7 @@ const QuizRoom = (onExit) => {
         borderBottom="1px solid rgba(255, 255, 255, 0.1)"
       >
         <Heading size="lg" mr={8} display="flex" alignItems="center">
-          <Icon as={FaRocket} mr={2} /> Quiz  {roomCode}
+          <Icon as={FaRocket} mr={2} /> Quiz Room :  {roomCode}
         </Heading>
 
         <Tabs index={activeTab} onChange={setActiveTab} variant="unstyled" flex={1}>
@@ -238,12 +229,20 @@ const QuizRoom = (onExit) => {
               leftIcon={<FaRocket />}
               borderRadius="full"
               px={8}
-              onClick={startQuiz}
               _hover={{ transform: "scale(1.05)" }}
             >
-              Start Quiz
+             Quiz will be Start soon!!
             </Button>
           )}
+          <Button
+              colorScheme="purple"
+              leftIcon={<FaRocket />}
+              borderRadius="full"
+              px={8}
+              _hover={{ transform: "scale(1.05)" }}
+            >
+             {name}
+            </Button>
           <Avatar name="Host" size="sm" bg="purple.500" />
         </Flex>
       </Flex>
@@ -302,24 +301,25 @@ const QuizRoom = (onExit) => {
               {/* Activity Tab */}
               <TabPanel p={0}>
                 <Box maxH="75vh" overflowY="auto"> {/* Set max height and enable scrolling */}
-                  <List spacing={4}>
-                    {activity.slice().reverse().map((act, index) => ( // Reverse the order
-                      <ListItem
-                        key={index}
-                        p={3}
-                        bg="rgba(255, 255, 255, 0.05)"
-                        borderRadius="lg"
-                      >
-                        <Flex align="center">
-                          <Icon as={FaRegBell} mr={3} color="purple.300" />
-                          <Text flex={1}>{act.msg}</Text>
-                          <Text fontSize="sm" opacity={0.7}>
-                            {act.time}
-                          </Text>
-                        </Flex>
-                      </ListItem>
-                    ))}
-                  </List>
+                <List spacing={4}>
+              {Array.isArray(activity) ? activity.slice().reverse().map((act, index) => (
+                <ListItem
+                  key={index}
+                  p={3}
+                  bg="rgba(255, 255, 255, 0.05)"
+                  borderRadius="lg"
+                >
+                  <Flex align="center">
+                    <Icon as={FaRegBell} mr={3} color="purple.300" />
+                    <Text flex={1}>{act.msg}</Text>
+                    <Text fontSize="sm" opacity={0.7}>
+                      {act.time}
+                    </Text>
+                  </Flex>
+                </ListItem>
+              )) : <Text>No activity found</Text>}
+            </List>
+
                 </Box>
               </TabPanel>
 
@@ -361,11 +361,11 @@ const QuizRoom = (onExit) => {
           initial={{ x: 20 }}
           animate={{ x: 0 }}
         >
-          {quizStarted && currentQuestion !== null ? (
+          {quizStarted && currentQuestion.question !== null ? (
             <Box>
               <Flex justify="space-between" mb={8}>
                 <Tag colorScheme="purple" px={4} py={2}>
-                  Question {currentQuestion + 1} of {questions.length}
+                  Question {currentQuestion.questionIndex} of {questionLength-1}
                 </Tag>
                 <Flex align="center" gap={2}>
                   <Icon as={FaClock} />
@@ -382,10 +382,10 @@ const QuizRoom = (onExit) => {
                 mb={8}
               >
                 <Heading size="lg" mb={6}>
-                  {questions[currentQuestion].question}
+                  {currentQuestion.question}
                 </Heading>
                 <Stack spacing={4}>
-                  {questions[currentQuestion].answers.map((answer, i) => (
+                {(currentQuestion?.options || []).map((answer, i) => (
                     <Button
                       key={i}
                       justifyContent="start"
@@ -393,7 +393,7 @@ const QuizRoom = (onExit) => {
                       p={6}
                       bg="rgba(255, 255, 255, 0.1)"
                       _hover={{ bg: "rgba(255, 255, 255, 0.15)" }}
-                      onClick={() => handleAnswer(i)}
+                      onClick={() => handleAnswer(answer)}
                     >
                       <Badge colorScheme="purple" mr={4}>{String.fromCharCode(65 + i)}</Badge>
                       {answer}
@@ -403,7 +403,7 @@ const QuizRoom = (onExit) => {
               </MotionBox>
 
               <Progress
-                value={(currentQuestion + 1) / questions.length * 100}
+                value={(currentQuestion.questionIndex) / (questionLength-1) * 100}
                 size="sm"
                 colorScheme="purple"
                 borderRadius="full"
