@@ -94,8 +94,6 @@ const QuizRoom = () => {
     setTimeLeft(quizData.timer);
     setIsLocked(false);
     selectedAnswer(null);
-
-
     if(quizData.questionIndex == 1) {
       setQuizStarted(true);
       toast({
@@ -105,7 +103,6 @@ const QuizRoom = () => {
         isClosable: true
       });
     }
-
       if(quizData.questionIndex == (quizDataLength)){
       console.log("length",questionLength);
         toast({
@@ -117,8 +114,6 @@ const QuizRoom = () => {
         setQuizStarted(false);
 
       }
-
-   
    
   });
 
@@ -135,17 +130,13 @@ const QuizRoom = () => {
    socket.on("usersUpdated", (users) => {
     setUsers(users);
   });
-   const handleUsersJoined = (users) => {
-    setUsers(users);
-  };
  
-
+ 
   return () => {
     socket.off('previousMessages');
-    socket.off('newMessage');
     socket.off('newMsg');
     socket.off('inValidroom');
-    socket.off("usersUpdated", handleUsersJoined);
+    socket.off("usersUpdated");
     socket.off("activityHistory");
     socket.off("startQuiz");
     socket.off("Question");
