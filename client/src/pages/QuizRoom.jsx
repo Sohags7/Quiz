@@ -93,7 +93,8 @@ const QuizRoom = () => {
     setQuestionLength(quizDataLength);
     setTimeLeft(quizData.timer);
     setIsLocked(false);
-    selectedAnswer(null);
+    setSelectedAnswer(null);
+
     if(quizData.questionIndex == 1) {
       setQuizStarted(true);
       toast({
@@ -163,6 +164,15 @@ const QuizRoom = () => {
   };
   const lockAnswer = () => {
     if (selectedAnswer) {
+      const userAnswer = {
+        name:name,
+        submitanswer : selectedAnswer,
+        correct_answer: currentQuestion.correct_answer,
+        team:team,
+        roomCode: roomCode,
+      };
+      socket.emit("userSelectedAnswer",userAnswer);
+
       setIsLocked(true);
     }
   };
@@ -426,6 +436,7 @@ const QuizRoom = () => {
                   colorScheme="purple"
                   size="lg"
                   w="100%"
+                  mb={4}
                   isDisabled={!selectedAnswer || isLocked}
                   onClick={lockAnswer}
                 >
@@ -436,7 +447,7 @@ const QuizRoom = () => {
                 value={(currentQuestion.questionIndex) / (questionLength-1) * 100}
                 size="sm"
                 colorScheme="purple"
-                borderRadius="full"
+                borderRadius="full" 
               />
             </Box>
           ) : (
