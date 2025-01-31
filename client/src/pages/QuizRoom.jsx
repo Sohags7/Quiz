@@ -86,17 +86,35 @@ const QuizRoom = () => {
   
 
   socket.on("Question",(quizData,quizDataLength) => {
-    console.log("here quiz data came", quizData);
+    console.log("here quiz data came", quizData.questionIndex,quizDataLength);
     setCurrentQuestion(quizData);
     setQuestionLength(quizDataLength);
     setTimeLeft(quizData.timer);
-    setQuizStarted(true);
-    // toast({
-    //   title: "Quiz Started!",
-    //   status: "success",
-    //   duration: 2000,
-    //   isClosable: true
-    // });
+    
+    if(quizData.questionIndex == 1) {
+      setQuizStarted(true);
+      toast({
+        title: "Quiz Started!",
+        status: "success",
+        duration: 2000,
+        isClosable: true
+      });
+    }
+
+      if(quizData.questionIndex == (quizDataLength)){
+      console.log("length",questionLength);
+        toast({
+          title: "Quiz End! Thank you for Participated in this quiz.",
+          status: "success",
+          duration: 2000,
+          isClosable: true
+        });
+        setQuizStarted(false);
+
+      }
+
+   
+   
   });
 
   socket.on("activityHistory", (activityHistory) => {

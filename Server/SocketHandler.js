@@ -83,6 +83,14 @@ export const setupSocket = (io) => {
                   });
               });
           });
+
+          allQuestions.push({
+            questionIndex: questionIndex,
+            question: '',
+            options: '',
+            correct_answer: '',
+            timer : timer
+        });
         console.log(timer);
 
           // Send each question one by one every `timer` milliseconds
@@ -93,12 +101,12 @@ export const setupSocket = (io) => {
                   index++;
   
                   // Schedule the next question
-                  setTimeout(sendNextQuestion, timer*1000);
-                  // setTimeout(sendNextQuestion, 1000);
+                  // setTimeout(sendNextQuestion, timer*1000);
+                  setTimeout(sendNextQuestion, 1000);
               }
           }
   
-          // Start sending questions
+          // Start sending questions 
           sendNextQuestion();
   
       } catch (error) {
